@@ -1,0 +1,20 @@
+{
+  "title": "Gen-Z Trend Journal",
+  "slug": "gen-z-trend-journal",
+  "status": "coming-soon",
+  "featured": false,
+  "category": "Future Project",
+  "shortDescription": "A student-built digital publication focused on authentic cultural shifts, emerging consumer behavior, and digital trends from a youth perspective. Students could research trends, write articles, create visuals, manage social media, and help turn that research into an actual publication.",
+  "fullDescription": "",
+  "image": "",
+  "imageAlt": "",
+  "applicationUrl": "",
+  "commitment": "",
+  "contributionAreas": [
+    {"name": "Writing & Editorial"},
+    {"name": "Research"},
+    {"name": "Social Media & Marketing"},
+    {"name": "Visual Design"}
+  ],
+  "sprint": []
+}

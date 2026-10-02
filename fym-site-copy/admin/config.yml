@@ -1,0 +1,70 @@
+backend:
+  name: github
+  repo: aayushjain1230/FYM-WEBSITE
+  branch: main
+
+media_folder: fym-site-copy/assets/uploads
+public_folder: /assets/uploads
+
+collections:
+  - name: projects
+    label: Projects
+    label_singular: Project
+    folder: content/projects
+    create: true
+    delete: true
+    extension: json
+    format: json
+    slug: "{{fields.slug}}"
+    identifier_field: title
+    summary: "{{title}} — {{status}}"
+    fields:
+      - {label: Title, name: title, widget: string}
+      - {label: URL slug, name: slug, widget: string, pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Use lowercase letters, numbers, and hyphens only.']}
+      - {label: Status, name: status, widget: select, options: [{label: Active, value: active}, {label: Coming Soon, value: coming-soon}, {label: Completed, value: completed}]}
+      - {label: Featured on Home, name: featured, widget: boolean, default: false}
+      - {label: Category, name: category, widget: string, required: false}
+      - {label: Short description, name: shortDescription, widget: text}
+      - {label: Full description, name: fullDescription, widget: text, required: false}
+      - {label: Project image, name: image, widget: image, required: false}
+      - {label: Image description, name: imageAlt, widget: string, required: false}
+      - {label: Application URL, name: applicationUrl, widget: string, required: false}
+      - {label: Expected commitment, name: commitment, widget: text, required: false}
+      - {label: Problem heading, name: problemHeading, widget: string, required: false}
+      - {label: Problem, name: problem, widget: text, required: false}
+      - {label: Approach heading, name: approachHeading, widget: string, required: false}
+      - {label: Approach, name: approach, widget: text, required: false}
+      - {label: Project goal, name: goal, widget: text, required: false}
+      - label: Contribution areas
+        name: contributionAreas
+        widget: list
+        required: false
+        fields:
+          - {label: Area, name: name, widget: string}
+          - {label: Description, name: description, widget: text, required: false}
+      - label: Sprint weeks
+        name: sprint
+        widget: list
+        required: false
+        fields:
+          - {label: Week name, name: name, widget: string}
+          - {label: Description, name: description, widget: text}
+  - name: people
+    label: Team
+    files:
+      - label: Team members
+        name: team
+        file: content/team.json
+        fields:
+          - label: Members
+            name: members
+            widget: list
+            summary: "{{fields.name}} — {{fields.role}}"
+            fields:
+              - {label: Name, name: name, widget: string}
+              - {label: Role, name: role, widget: string}
+              - {label: Bio, name: bio, widget: text}
+              - {label: More about this person, name: detail, widget: text, required: false}
+              - {label: Photo, name: photo, widget: image, required: false}
+              - {label: Photo description, name: photoAlt, widget: string, required: false}
+              - {label: Display order, name: order, widget: number, value_type: int, default: 1}

@@ -1,5 +1,10 @@
 # dependencies
 node_modules/
+dist/
+.netlify/
+.env
+.env.*
+!.env.example
 .vscode/
 .idea/
 .wix/

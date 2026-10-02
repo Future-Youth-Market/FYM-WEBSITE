@@ -1,51 +1,40 @@
 # Future Youth Market website
 
-This repository contains the standalone redesign in `fym-site-copy/` and the Wix/Velo code in `src/`. The standalone pages can be opened locally from `fym-site-copy/index.html`.
+Future Youth Market (FYM) is a student-led organization where students work together on projects they can share. This repository contains the standalone FYM V1 website prepared for Netlify. The existing Wix site is not changed by this build or deployment configuration.
 
-**Important:** Uploading this source to GitHub does not, by itself, update the visual Wix Editor layout or publish the website. Verify the actual Wix Preview separately.
+## Run locally
 
-## Wix Git Integration & CLI
+Requires Node.js 20 or newer. No Wix tooling or environment variables are needed to build the public site.
 
-This repo is part of Git Integration & Wix CLI, a set of tools that allows you to write, test, and publish code for your Wix site locally on your computer. 
+```sh
+npm ci
+npm run dev
+```
 
-Connect your site to GitHub, develop in your favorite IDE, test your code in real time, and publish your site from the command line.
+Open `http://127.0.0.1:4177/`. The preview serves the generated `dist/` directory. Run `npm run build` to rebuild after editing content; restart `npm run dev` to preview the new build. Run `npm test` for route and content checks.
 
-## Set up this repository in your IDE
-The original Wix source used Git integration. This newly created GitHub repository has not been verified as the Wix site's connected repository; pushing to it should not be assumed to update Wix.
+## Structure
 
-Before getting started, make sure you have the following things installed:
-* [Git](https://git-scm.com/download)
-* [Node](https://nodejs.org/en/download/), version 14.8 or later.
-* [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) or [yarn](https://yarnpkg.com/getting-started/install)
-* An SSH key [added to your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
+- `fym-site-copy/`: approved standalone HTML/CSS/JS design, local project imagery, and Decap `/admin/` files.
+- `content/projects/*.json`: project content. Active and completed projects get `/projects/<slug>/` pages from one template; coming-soon projects appear only in the marketplace.
+- `content/team.json`: verified team members, in display order.
+- `scripts/build-site.cjs`: zero-dependency static build into `dist/`.
+- `scripts/dev-site.cjs`: local static preview of that build.
+- `scripts/test-site.cjs`: direct-route and launch-content checks.
+- `src/`, `wix.config.json`, and `scripts/build-wix-embed.cjs`: legacy Wix/Velo integration, preserved for reference but excluded from the Netlify build.
 
-To set up your local environment and start coding locally, do the following:
+The build copies existing pages, replaces the Home featured project, Projects marketplace, Team feature, and reusable project detail from the JSON content, then writes standalone HTML. It does not use Velo or a Wix embed. Historical Kelly Angelovic and TravelerLenz case studies remain separate from the current-project marketplace.
 
-1. Open your terminal and navigate to where you want to store the repo.
-1. Clone the repo by running `git clone <your-repository-url>`.
-1. Navigate to the repo's directory by running `cd <directory-name>`.
-1. Install the repo's dependencies by running `npm install` or `yarn install`.
-1. Install the Wix CLI by running `npm install -g @wix/cli` or `yarn global add @wix/cli`.  
-   Once you've installed the CLI globally, you can use it with any Wix site's repo.
+## Netlify
 
-For more information, see [Setting up Git Integration & Wix CLI](https://support.wix.com/en/article/velo-setting-up-git-integration-wix-cli-beta).
+Connect the existing GitHub repository `aayushjain1230/FYM-WEBSITE` to a **new Netlify preview project**, not the current Wix production site. `netlify.toml` runs `npm run build` and publishes `dist/`. Each public route has its own `index.html`; direct visits and refreshes do not need an SPA fallback. Keep Wix and DNS untouched until FYM approves the replacement.
 
-## Write Velo code in your IDE
-Once your repo is set up, you can write code in it as you would in any other non-Wix project. The repo's file structure matches the [public](https://support.wix.com/en/article/velo-working-with-the-velo-sidebar#public), [backend](https://support.wix.com/en/article/velo-working-with-the-velo-sidebar#backend), and [page code](https://support.wix.com/en/article/velo-working-with-the-velo-sidebar#page-code) sections in Editor X.
+No build-time environment variables are required. The Scholarship Opportunity Finder application opens its verified Google Form in a new tab. Idea submissions currently open the existing FYM Wix Form as an external service; replacing that form later requires an FYM-owned form URL, not a site rebuild.
 
-Learn more about [this repo's file structure](https://support.wix.com/en/article/velo-understanding-your-sites-github-repository-beta).
+## Content manager
 
-## Test your code with the Local Editor
-The Local Editor allows you test changes made to your site in real time. The code in your local IDE is synced with the Local Editor, so you can test your changes before committing them to your repo. You can also change the site design in the Local Editor and sync it with your IDE.
+Decap CMS is at `/admin/`. Its GitHub backend edits `content/projects/*.json` and `content/team.json`, then commits to `main`; Netlify rebuilds when that branch changes. FYM's Netlify owner must configure GitHub OAuth before anyone can log in. No token or client secret belongs in this repository. See [the non-developer CMS guide](docs/FYM-CMS-GUIDE.md) and [developer handoff](docs/DEVELOPER-HANDOFF.md).
 
-Start the Local Editor by navigating to this repo's directory in your terminal and running `wix dev`.
+The supported setup is [Decap's GitHub backend](https://decapcms.org/docs/github-backend/) with [Netlify's OAuth provider](https://docs.netlify.com/manage/security/secure-access-to-sites/oauth-provider-tokens/). Netlify's Git Gateway is deprecated for new configurations, so this project does not use it.
 
-For more information, see [Working with the Local Editor](https://support.wix.com/en/article/velo-working-with-the-local-editor-beta).
-
-## Preview and publish with the Wix CLI
-The Wix CLI is a tool that allows you to work with your site locally from your computer's terminal. You can use it to build a preview version of your site and publish it. You can also use the CLI to install [approved npm packages](https://support.wix.com/en/article/velo-working-with-npm-packages) to your site.
-
-Learn more about [working with the Wix CLI](https://support.wix.com/en/article/velo-working-with-the-wix-cli-beta).
-
-## Invite contributors to work with you
-Git Integration & Wix CLI extends Editor X's [concurrent editing](https://support.wix.com/en/article/editor-x-about-concurrent-editing) capabilities. Invite other developers as collaborators on your [site](https://support.wix.com/en/article/inviting-people-to-contribute-to-your-site) and your [GitHub repo](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-access-to-your-personal-repositories/inviting-collaborators-to-a-personal-repository). Multiple developers can work on a site's code at once.
+FYM should retain administrative access to GitHub, Netlify, the domain/DNS account, Decap OAuth configuration, Google Forms, and response Sheets. Two appropriate FYM leaders should have admin access where possible. Do not put passwords or tokens in project files.

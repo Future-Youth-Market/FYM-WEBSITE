@@ -1320,3 +1320,9 @@ h3 {
     margin-top: 34px;
   }
 }
+
+@media (max-width: 500px) {
+  .lockup-large {
+    font-size: clamp(120px, 42vw, 180px);
+  }
+}
