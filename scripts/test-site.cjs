@@ -38,12 +38,26 @@ assert.ok(!fs.existsSync(path.join(output, 'projects', 'gen-z-trend-journal')));
 assert.ok(!fs.existsSync(path.join(output, 'projects', 'open-source-fintech-productivity-tools')));
 const scholarship = read('projects/scholarship-opportunity-finder');
 assert.match(scholarship, /3–5 hours/);
+for (const area of ['Technology / Development', 'Research &amp; Data', 'UI/UX Design', 'Writing', 'Product / Operations', 'Outreach &amp; People']) {
+  assert.ok(scholarship.includes(area), `Missing contribution area: ${area}`);
+}
+for (const week of ['Research &amp; Understand', 'Research &amp; Plan', 'Build', 'Test', 'Improve', 'Finish &amp; Publish']) {
+  assert.ok(scholarship.includes(week), `Missing sprint week: ${week}`);
+}
+assert.match(scholarship, /The solution is the team&#39;s to shape/);
+assert.match(scholarship, /Why it matters/);
+assert.match(scholarship, /You do not need to be an expert/i);
+assert.equal((scholarship.match(/class="project-task-list"/g) || []).length, 12);
 assert.equal((scholarship.match(/target="_blank" rel="noopener noreferrer">Apply to Join Project/g) || []).length, 2);
 assert.match(scholarship, /1FAIpQLSd2fAH3XpnudyaP8Pn4JMCnjhFr3pEanikX0TLwIOoX3VpvDw/);
 assert.match(read('team'), /Olivia Chevalier/);
 assert.doesNotMatch(read('team'), /fake|placeholder/i);
 assert.match(read('admin'), /decap-cms/);
 assert.ok(fs.existsSync(path.join(output, 'admin', 'config.yml')));
+const cms = fs.readFileSync(path.join(output, 'admin', 'config.yml'), 'utf8');
+for (const field of ['whatWeAreBuilding', 'whyItMatters', 'contributionAreas', 'tasks', 'skills', 'commitment', 'sprint', 'status', 'image', 'applicationUrl']) {
+  assert.match(cms, new RegExp(`name: ${field}\\b`), `Decap is missing ${field}`);
+}
 assert.ok(fs.existsSync(path.join(output, 'styles.css')));
 assert.ok(!fs.existsSync(path.join(output, 'wix-embed.generated.txt')));
 console.log(`Passed standalone route/content checks for ${routes.length} routes.`);

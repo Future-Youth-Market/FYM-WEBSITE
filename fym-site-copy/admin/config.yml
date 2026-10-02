@@ -33,7 +33,8 @@ collections:
       - {label: Problem heading, name: problemHeading, widget: string, required: false}
       - {label: Problem, name: problem, widget: text, required: false}
       - {label: Approach heading, name: approachHeading, widget: string, required: false}
-      - {label: Approach, name: approach, widget: text, required: false}
+      - {label: What we're building, name: whatWeAreBuilding, widget: text, required: false}
+      - {label: Why it matters, name: whyItMatters, widget: text, required: false}
       - {label: Project goal, name: goal, widget: text, required: false}
       - label: Contribution areas
         name: contributionAreas
@@ -42,13 +43,16 @@ collections:
         fields:
           - {label: Area, name: name, widget: string}
           - {label: Description, name: description, widget: text, required: false}
+          - {label: Student work and responsibilities, name: tasks, widget: list, required: false, field: {label: Task, name: task, widget: string}}
+          - {label: Relevant skills (optional), name: skills, widget: list, required: false, field: {label: Skill, name: skill, widget: string}}
       - label: Sprint weeks
         name: sprint
         widget: list
         required: false
         fields:
           - {label: Week name, name: name, widget: string}
-          - {label: Description, name: description, widget: text}
+          - {label: Description, name: description, widget: text, required: false}
+          - {label: Week activities, name: tasks, widget: list, required: false, field: {label: Activity, name: activity, widget: string}}
   - name: people
     label: Team
     files:

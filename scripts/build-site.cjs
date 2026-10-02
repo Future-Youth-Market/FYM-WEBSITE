@@ -26,6 +26,12 @@ function validate() {
     if (project.applicationUrl && !/^https:\/\//.test(project.applicationUrl)) throw new Error(`Application URL must use HTTPS: ${project.slug}`);
     if (project.status !== 'active' && project.applicationUrl) throw new Error(`Only active projects can accept applications: ${project.slug}`);
     if (project.image && !project.imageAlt) throw new Error(`Project image needs alt text: ${project.slug}`);
+    for (const area of project.contributionAreas || []) {
+      if (!area.name || (area.tasks && (!Array.isArray(area.tasks) || area.tasks.some(task => typeof task !== 'string')))) throw new Error(`Invalid contribution area: ${project.slug}`);
+    }
+    for (const week of project.sprint || []) {
+      if (!week.name || (week.tasks && (!Array.isArray(week.tasks) || week.tasks.some(task => typeof task !== 'string')))) throw new Error(`Invalid sprint week: ${project.slug}`);
+    }
   }
   for (const person of team) {
     if (!person.name || !person.role || !person.bio) throw new Error('Team members need name, role, and bio.');
@@ -62,15 +68,22 @@ function marketCard(project) {
   return `<article class="market-card ${current ? 'featured' : 'future'}"><div><p class="label">${badge}</p><h2>${escape(project.title)}</h2><p>${escape(project.shortDescription)}</p>${project.image ? `<img class="portfolio-image" src="${escape(project.image)}" alt="${escape(project.imageAlt)}" loading="lazy">` : ''}${tags(project)}</div><div class="market-meta"><p class="category">${escape(project.category)}</p>${action}</div></article>`;
 }
 
+function taskList(tasks) {
+  return Array.isArray(tasks) && tasks.length
+    ? `<ul class="project-task-list">${tasks.map(task => `<li>${escape(task)}</li>`).join('')}</ul>`
+    : '';
+}
+
 function projectMain(project) {
   const apply = project.status === 'active' && project.applicationUrl
     ? `<a class="button" href="${escape(project.applicationUrl)}" target="_blank" rel="noopener noreferrer">Apply to Join Project</a>` : '';
   const image = project.image ? `<div class="section-inner"><img class="portfolio-image" src="${escape(project.image)}" alt="${escape(project.imageAlt)}"></div>` : '';
-  const story = project.problem || project.approach ? `<section class="section warm"><div class="section-inner project-story-grid">${project.problem ? `<article><p class="label">The Problem</p><h2>${escape(project.problemHeading || 'The problem')}</h2><p>${escape(project.problem)}</p></article>` : ''}${project.approach ? `<article><p class="label">What We're Building</p><h2>${escape(project.approachHeading || 'Our approach')}</h2><p>${escape(project.approach)}</p></article>` : ''}</div></section>` : '';
-  const areas = (project.contributionAreas || []).length ? `<section class="section cream"><div class="section-inner"><p class="label">What Students Would Actually Do</p><h2 class="section-title">Ways to contribute.</h2><div class="project-contribution-grid">${project.contributionAreas.map((area, i) => `<article class="ruled"><p class="number">${String(i + 1).padStart(2, '0')}</p><h3>${escape(area.name)}</h3>${area.description ? `<p>${escape(area.description)}</p>` : ''}</article>`).join('')}</div></div></section>` : '';
+  const building = project.whatWeAreBuilding || project.approach;
+  const story = project.problem || building || project.whyItMatters ? `<section class="section warm"><div class="section-inner project-story-grid">${project.problem ? `<article><p class="label">The Problem</p><h2>${escape(project.problemHeading || 'The problem')}</h2><p>${escape(project.problem)}</p>${project.whyItMatters ? `<h3>Why it matters</h3><p>${escape(project.whyItMatters)}</p>` : ''}</article>` : ''}${building ? `<article><p class="label">What We're Building</p><h2>${escape(project.approachHeading || 'The project')}</h2><p>${escape(building)}</p></article>` : ''}</div></section>` : '';
+  const areas = (project.contributionAreas || []).length ? `<section class="section cream"><div class="section-inner"><p class="label">What Students Would Actually Do</p><h2 class="section-title">Ways to contribute.</h2><p>You do not need to be an expert to help.</p><div class="project-contribution-grid">${project.contributionAreas.map((area, i) => `<article class="ruled"><p class="number">${String(i + 1).padStart(2, '0')}</p><h3>${escape(area.name)}</h3>${area.description ? `<p>${escape(area.description)}</p>` : ''}${taskList(area.tasks)}${(area.skills || []).length ? `<p class="label">Skills</p>${taskList(area.skills)}` : ''}</article>`).join('')}</div></div></section>` : '';
   const goal = project.goal ? `<section class="section warm project-goal"><div class="section-inner split-grid"><div><p class="label">Project Goal</p><h2 class="section-title">Work toward a useful first version.</h2></div><p class="lead-block">${escape(project.goal)}</p></div></section>` : '';
   const commitment = project.commitment ? `<section class="section cream tight"><div class="section-inner split-grid"><div><p class="label">Expected Commitment</p><h2 class="section-title">What participation involves.</h2></div><p class="lead-block">${escape(project.commitment)}</p></div></section>` : '';
-  const sprint = (project.sprint || []).length ? `<section class="section warm"><div class="section-inner"><p class="label">Project Sprint</p><h2 class="section-title">A framework for making something tangible.</h2><div class="sprint-timeline detailed">${project.sprint.map((week, i) => `<article><span>Week ${i + 1}</span><h3>${escape(week.name)}</h3><p>${escape(week.description)}</p></article>`).join('')}</div></div></section>` : '';
+  const sprint = (project.sprint || []).length ? `<section class="section warm"><div class="section-inner"><p class="label">Project Sprint</p><h2 class="section-title">A framework for making something tangible.</h2><p>The timeline gives the team structure, not a rigid script. It can change with the solution they choose to build.</p><div class="sprint-timeline detailed">${project.sprint.map((week, i) => `<article><span>Week ${i + 1}</span><h3>${escape(week.name)}</h3>${week.description ? `<p>${escape(week.description)}</p>` : ''}${taskList(week.tasks)}</article>`).join('')}</div></div></section>` : '';
   const closing = apply ? `<section class="section blue with-lead"><div class="section-inner split-grid"><div><p class="label cream-label">Ready to Build With Us?</p><h2 class="section-title">Interested in helping create the ${escape(project.title)}?</h2></div><div><p>Choose an area where you think you can contribute and tell us what you are interested in working on.</p><a class="button cream-button" href="${escape(project.applicationUrl)}" target="_blank" rel="noopener noreferrer">Apply to Join Project</a></div></div></section>` : '';
   return `<main><section class="case-header cream project-hero"><div class="section-inner"><a class="text-link back-link" href="../">Back to Projects</a><p class="label">${project.status === 'active' ? 'Current Project' : 'Completed Project'}${project.category ? ` · ${escape(project.category)}` : ''}</p><h1>${escape(project.title)}</h1><p class="lead-block">${escape(project.fullDescription || project.shortDescription)}</p><div class="actions left-actions">${apply}</div></div></section>${image}${story}${areas}${goal}${commitment}${sprint}${closing}</main>`;
 }

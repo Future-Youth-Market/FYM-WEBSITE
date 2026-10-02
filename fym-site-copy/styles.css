@@ -535,6 +535,18 @@ h3 {
   line-height: 1.04;
 }
 
+.project-task-list {
+  margin: 14px 0 0;
+  padding-left: 19px;
+  color: var(--fym-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.project-task-list li + li {
+  margin-top: 7px;
+}
+
 .project-goal .lead-block {
   margin-top: 0;
 }
