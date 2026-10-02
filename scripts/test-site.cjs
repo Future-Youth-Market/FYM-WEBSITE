@@ -34,6 +34,8 @@ assert.match(marketplace, /Scholarship Opportunity Finder/);
 assert.match(marketplace, /Gen-Z Trend Journal/);
 assert.match(marketplace, /Open-Source FinTech \/ Productivity Tools/);
 assert.equal((marketplace.match(/Coming Soon/g) || []).length, 2);
+assert.ok(!fs.existsSync(path.join(output, 'projects', 'gen-z-trend-journal')));
+assert.ok(!fs.existsSync(path.join(output, 'projects', 'open-source-fintech-productivity-tools')));
 const scholarship = read('projects/scholarship-opportunity-finder');
 assert.match(scholarship, /3–5 hours/);
 assert.equal((scholarship.match(/target="_blank" rel="noopener noreferrer">Apply to Join Project/g) || []).length, 2);

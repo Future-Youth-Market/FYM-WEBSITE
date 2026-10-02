@@ -76,17 +76,21 @@ function projectMain(project) {
 }
 
 function teamFeature(person) {
-  const photo = person.photo ? `<img class="portfolio-image" src="${escape(person.photo)}" alt="${escape(person.photoAlt)}">` : `<div class="founder-mark"><p class="label">Founder</p><span>${escape(person.name).replace(' ', '<br>')}</span><p>Future Youth Market</p></div>`;
+  const photo = person.photo ? `<img class="portfolio-image" src="${escape(person.photo)}" alt="${escape(person.photoAlt)}">` : `<div class="founder-mark"><p class="label">${person.name === 'Olivia Chevalier' ? 'Founder' : 'Team'}</p><span>${escape(person.name).replace(' ', '<br>')}</span><p>Future Youth Market</p></div>`;
   return `<section class="section warm wide"><div class="section-inner founder-feature">${photo}<div class="founder-copy"><p>${escape(person.bio)}</p><p class="category">${escape(person.role)}</p>${person.detail ? `<p class="muted">${escape(person.detail)}</p>` : ''}${person.name === 'Olivia Chevalier' ? '<p><a class="text-link" href="mailto:futureyouthmarket@gmail.com">Email Me Personally</a></p>' : ''}</div></div></section>`;
 }
 
 function build() {
   validate();
+  if (path.dirname(output) !== root || path.dirname(path.join(output, 'projects')) !== output) {
+    throw new Error('Refusing to clean a path outside the project build directory.');
+  }
   fs.rmSync(output, { recursive: true, force: true });
   fs.cpSync(source, output, { recursive: true, filter: file => {
     const name = path.basename(file);
     return !name.startsWith('wix-') && name !== 'site-config.json' && name !== 'site.js';
   }});
+  fs.rmSync(path.join(output, 'projects'), { recursive: true, force: true });
   const featured = projects.find(project => project.featured && project.status === 'active');
   let home = fs.readFileSync(path.join(source, 'index.html'), 'utf8');
   const preview = `<article class="project-preview intro-grid"><div><p class="label">Active Project</p><h3>${escape(featured.title)}</h3></div><div><p>${escape(featured.shortDescription)}</p><a class="text-link icon-link" href="./projects/${escape(featured.slug)}/">View Project</a></div></article>`;
