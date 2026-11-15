@@ -27,9 +27,13 @@ The build copies existing pages, replaces the Home featured project, Projects ma
 
 ## Netlify
 
-Connect the existing GitHub repository `aayushjain1230/FYM-WEBSITE` to a **new Netlify preview project**, not the current Wix production site. `netlify.toml` runs `npm run build` and publishes `dist/`. Each public route has its own `index.html`; direct visits and refreshes do not need an SPA fallback. Keep Wix and DNS untouched until FYM approves the replacement.
+Connect the existing GitHub repository `Future-Youth-Market/FYM-WEBSITE` to a **new Netlify preview project**, not the current Wix production site. `netlify.toml` runs `npm run build` and publishes `dist/`. Each public route has its own `index.html`; direct visits and refreshes do not need an SPA fallback. Keep Wix and DNS untouched until FYM approves the replacement.
 
-No build-time environment variables are required. The Scholarship Opportunity Finder application opens its verified Google Form in a new tab. Idea submissions currently open the existing FYM Wix Form as an external service; replacing that form later requires an FYM-owned form URL, not a site rebuild.
+Set the optional build-time variable `SCHOLARSHIP_FINDER_URL` on the **main FYM website** in Netlify once the separately deployed Finder has an approved public HTTPS URL. Rebuild the main site to activate **Explore Scholarship Finder** on the Projects card and the existing project detail page. With the variable unset or blank, both pages show **Scholarship Finder coming soon**. Invalid destinations fail the build. The separate **Apply to Join Project** links still open the recruitment form.
+
+For an approved launch, verify the destination independently and check both FYM links in a preview build before releasing the integration. A return link from the Finder to FYM is a separate follow-up for the Finder repository.
+
+Idea submissions currently open the existing FYM Wix Form as an external service; replacing that form later requires an FYM-owned form URL, not a site rebuild.
 
 ## Content manager
 

@@ -5,7 +5,12 @@ const { execFileSync } = require('node:child_process');
 
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, 'dist');
-execFileSync(process.execPath, [path.join(__dirname, 'build-site.cjs')], { stdio: 'inherit' });
+const buildScript = path.join(__dirname, 'build-site.cjs');
+const build = (url, stdio = 'inherit') => execFileSync(process.execPath, [buildScript], {
+  stdio,
+  env: { ...process.env, SCHOLARSHIP_FINDER_URL: url }
+});
+build('');
 const read = route => fs.readFileSync(path.join(output, route, 'index.html'), 'utf8');
 const routes = ['', 'about', 'projects', 'projects/scholarship-opportunity-finder', 'team', 'get-involved', 'submit-an-idea', 'our-work', 'our-work/kelly-angelovic', 'our-work/travelerlenz', 'admin'];
 for (const route of routes) {
@@ -60,4 +65,25 @@ for (const field of ['whatWeAreBuilding', 'whyItMatters', 'contributionAreas', '
 }
 assert.ok(fs.existsSync(path.join(output, 'styles.css')));
 assert.ok(!fs.existsSync(path.join(output, 'wix-embed.generated.txt')));
+const detailRoute = 'projects/scholarship-opportunity-finder';
+for (const route of ['projects', detailRoute]) {
+  assert.match(read(route), /Scholarship Finder coming soon/);
+  assert.doesNotMatch(read(route), /Explore Scholarship Finder/);
+}
+assert.doesNotMatch(read(''), /Scholarship Finder coming soon/);
+try {
+  build('https://finder.example.org/?source=fym&section=projects');
+  for (const route of ['projects', detailRoute]) {
+    const html = read(route);
+    assert.equal((html.match(/>Explore Scholarship Finder<\/a>/g) || []).length, 1);
+    assert.match(html, /href="https:\/\/finder\.example\.org\/\?source=fym&amp;section=projects" target="_blank" rel="noopener noreferrer"/);
+    assert.doesNotMatch(html, /Scholarship Finder coming soon/);
+  }
+  assert.equal((read(detailRoute).match(/>Apply to Join Project<\/a>/g) || []).length, 2);
+  for (const url of ['https://localhost:5176', 'https://github.com/Future-Youth-Market/Scholarship-Opportunity-Finder', 'https://deploy-preview-1--finder.netlify.app', 'javascript:alert(1)']) {
+    assert.throws(() => build(url, 'pipe'), /SCHOLARSHIP_FINDER_URL must be the approved public HTTPS application URL/);
+  }
+} finally {
+  build('');
+}
 console.log(`Passed standalone route/content checks for ${routes.length} routes.`);

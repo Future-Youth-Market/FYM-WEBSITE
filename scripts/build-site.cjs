@@ -14,6 +14,33 @@ const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 })[char]);
 
+const finderSlug = 'scholarship-opportunity-finder';
+
+function buildFinderAction() {
+  const configuredUrl = process.env.SCHOLARSHIP_FINDER_URL?.trim();
+  if (!configuredUrl) return '<p class="coming-soon">Scholarship Finder coming soon</p>';
+
+  let url;
+  try {
+    if (!configuredUrl.startsWith('https://') || /\s/.test(configuredUrl)) throw new Error();
+    url = new URL(configuredUrl);
+    const host = url.hostname.replace(/\.$/, '');
+    if (url.username || url.password || !host.includes('.') ||
+        /^(?:\d+\.){3}\d+$/.test(host) ||
+        /(?:^|\.)(?:localhost|local|internal|github\.com)$/.test(host) ||
+        /^(?:deploy-preview-\d+|[a-f0-9]{24})--.*\.netlify\.app$/.test(host)) throw new Error();
+  } catch {
+    throw new Error('SCHOLARSHIP_FINDER_URL must be the approved public HTTPS application URL.');
+  }
+  return `<a class="button" href="${escape(url.href)}" target="_blank" rel="noopener noreferrer" aria-label="Explore Scholarship Finder (opens in a new tab)">Explore Scholarship Finder</a>`;
+}
+
+const finderCta = buildFinderAction();
+
+function finderAction(project) {
+  return project.slug === finderSlug ? finderCta : '';
+}
+
 function validate() {
   const slugs = new Set();
   for (const project of projects) {
@@ -65,7 +92,7 @@ function marketCard(project) {
   const action = current || project.status === 'completed'
     ? `<a class="button" href="./${escape(project.slug)}/">View Project</a>`
     : '<p class="coming-soon">Coming Soon</p>';
-  return `<article class="market-card ${current ? 'featured' : 'future'}"><div><p class="label">${badge}</p><h2>${escape(project.title)}</h2><p>${escape(project.shortDescription)}</p>${project.image ? `<img class="portfolio-image" src="${escape(project.image)}" alt="${escape(project.imageAlt)}" loading="lazy">` : ''}${tags(project)}</div><div class="market-meta"><p class="category">${escape(project.category)}</p>${action}</div></article>`;
+  return `<article class="market-card ${current ? 'featured' : 'future'}"><div><p class="label">${badge}</p><h2>${escape(project.title)}</h2><p>${escape(project.shortDescription)}</p>${project.image ? `<img class="portfolio-image" src="${escape(project.image)}" alt="${escape(project.imageAlt)}" loading="lazy">` : ''}${tags(project)}</div><div class="market-meta"><p class="category">${escape(project.category)}</p>${finderAction(project)}${action}</div></article>`;
 }
 
 function taskList(tasks) {
@@ -85,7 +112,7 @@ function projectMain(project) {
   const commitment = project.commitment ? `<section class="section cream tight"><div class="section-inner split-grid"><div><p class="label">Expected Commitment</p><h2 class="section-title">What participation involves.</h2></div><p class="lead-block">${escape(project.commitment)}</p></div></section>` : '';
   const sprint = (project.sprint || []).length ? `<section class="section warm"><div class="section-inner"><p class="label">Project Sprint</p><h2 class="section-title">A framework for making something tangible.</h2><p>The timeline gives the team structure, not a rigid script. It can change with the solution they choose to build.</p><div class="sprint-timeline detailed">${project.sprint.map((week, i) => `<article><span>Week ${i + 1}</span><h3>${escape(week.name)}</h3>${week.description ? `<p>${escape(week.description)}</p>` : ''}${taskList(week.tasks)}</article>`).join('')}</div></div></section>` : '';
   const closing = apply ? `<section class="section blue with-lead"><div class="section-inner split-grid"><div><p class="label cream-label">Ready to Build With Us?</p><h2 class="section-title">Interested in helping create the ${escape(project.title)}?</h2></div><div><p>Choose an area where you think you can contribute and tell us what you are interested in working on.</p><a class="button cream-button" href="${escape(project.applicationUrl)}" target="_blank" rel="noopener noreferrer">Apply to Join Project</a></div></div></section>` : '';
-  return `<main><section class="case-header cream project-hero"><div class="section-inner"><a class="text-link back-link" href="../">Back to Projects</a><p class="label">${project.status === 'active' ? 'Current Project' : 'Completed Project'}${project.category ? ` · ${escape(project.category)}` : ''}</p><h1>${escape(project.title)}</h1><p class="lead-block">${escape(project.fullDescription || project.shortDescription)}</p><div class="actions left-actions">${apply}</div></div></section>${image}${story}${areas}${goal}${commitment}${sprint}${closing}</main>`;
+  return `<main><section class="case-header cream project-hero"><div class="section-inner"><a class="text-link back-link" href="../">Back to Projects</a><p class="label">${project.status === 'active' ? 'Current Project' : 'Completed Project'}${project.category ? ` · ${escape(project.category)}` : ''}</p><h1>${escape(project.title)}</h1><p class="lead-block">${escape(project.fullDescription || project.shortDescription)}</p><div class="actions left-actions">${finderAction(project)}${apply}</div></div></section>${image}${story}${areas}${goal}${commitment}${sprint}${closing}</main>`;
 }
 
 function teamFeature(person) {
